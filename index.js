@@ -14,7 +14,29 @@ async function getProducts() {
     } catch (e) { return null; }
 }
 
-function getPr(o) { return parseFloat((o.price?.amount || o.price?.value || o.unit_price || o.price || 0)).toFixed(2); }
+function getPr(o) {
+    const rawPrice =
+        o.price?.amount ??
+        o.price?.value ??
+        o.unit_price ??
+        o.display_price ??
+        o.price_display ??
+        o.price ??
+        o.currency_value ??
+        o.amount ??
+        o.variants?.[0]?.price?.amount ??
+        o.variants?.[0]?.price?.value ??
+        o.variants?.[0]?.unit_price ??
+        o.variants?.[0]?.display_price ??
+        o.variants?.[0]?.price_display ??
+        o.variants?.[0]?.price ??
+        o.variants?.[0]?.currency_value ??
+        o.variants?.[0]?.amount ??
+        0;
+
+    const num = parseFloat(String(rawPrice).replace(/[^\d.,-]/g, '').replace(',', '.'));
+    return isNaN(num) ? '0.00' : num.toFixed(2);
+}
 
 async function createEmbed() {
     const prods = await getProducts();
